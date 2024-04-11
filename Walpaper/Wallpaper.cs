@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +12,8 @@ namespace Walpaper
 {
     public class Wallpaper : INotifyPropertyChanged
     {
+        [Key]
+        public int id { get; set; }
         public string Name { get; set; }
 
         private string _path;

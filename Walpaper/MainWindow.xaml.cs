@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Org.BouncyCastle.Asn1.BC;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -37,11 +38,7 @@ namespace Walpaper
             wallpapers = new ObservableCollection<Wallpaper>();
             InitializeComponent();
             string currentPath = GetPathOfWallpaper();
-
-            wallpapers.Add(new Wallpaper("When app started", currentPath));
-
-            listWallpapers.SelectedIndex = 0;
-
+            UpdateTable();
         }
 
         public void ChangeWallpaper(string imagePath)
@@ -51,12 +48,13 @@ namespace Walpaper
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string wallpaperPath = "";
             AddWallpaper addWallpaperWindow = new AddWallpaper(this);
             addWallpaperWindow.ShowDialog();
             if (addWallpaperWindow.Success)
             {
-                wallpapers.Add(addWallpaperWindow.wallpaper);
+                Wallpaper newWallpaper = addWallpaperWindow.wallpaper;
+                AddWallpaper(newWallpaper);
+                UpdateTable();
             }
         }
         private string GetPathOfWallpaper()
@@ -85,9 +83,34 @@ namespace Walpaper
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
             Wallpaper toDelete = (Wallpaper)listWallpapers.SelectedItem;
-            wallpapers.Remove(toDelete);
+            DeleteWallpaper(toDelete);
+            UpdateTable();
             borderImage.Visibility = Visibility.Hidden;
         }
-      
+
+        private void AddWallpaper(Wallpaper newWallpaper)
+        {
+            WallpaperContext context = new WallpaperContext();
+            context.Wallpapers.Add(newWallpaper);
+            context.SaveChanges();
+        }
+
+        private void DeleteWallpaper(Wallpaper toDeleteWallpaper)
+        {
+            WallpaperContext context = new WallpaperContext();
+            context.Wallpapers.Remove(toDeleteWallpaper);
+            context.SaveChanges();
+        }
+
+        private void UpdateTable()
+        {
+            WallpaperContext context = new WallpaperContext();
+            List<Wallpaper> newList = context.Wallpapers.ToList();
+            wallpapers.Clear();
+            foreach(Wallpaper wallpaper in newList) 
+            {
+                wallpapers.Add(wallpaper);
+            }
+        }
     }
 }
